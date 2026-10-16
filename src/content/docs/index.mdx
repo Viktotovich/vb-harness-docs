@@ -1,0 +1,58 @@
+---
+title: vb-harness
+description: Get real coding work out of a model on your own machine. Small tasks, your project's own checks, and an evidence-gated review.
+template: splash
+hero:
+  tagline: Get real coding work out of the model on your own machine. The harness plans a feature as small tasks, has your model implement them one at a time, proves every change with your project's own checks, and re-reviews what it built with an evidence gate.
+  actions:
+    - text: Get started
+      link: /start/install/
+      icon: right-arrow
+    - text: Read the cookbook
+      link: /cookbook/astro-landing-page/
+      variant: secondary
+    - text: GitHub
+      link: https://github.com/Viktotovich/vb-harness-for-agentic-building
+      icon: external
+      variant: minimal
+---
+
+{/* SPDX-License-Identifier: Apache-2.0 */}
+{/* Copyright 2026 V and Bruno LLC */}
+
+import { Card, CardGrid, LinkCard } from "@astrojs/starlight/components";
+
+<video class="vb-video" src="/media/demo.mp4" poster="/poster/demo-poster.png" autoplay muted loop playsinline preload="metadata" aria-label="An animated illustration of a run in the app: a request, the live progress card, rejected outputs and why, the evidence-gated review, a claim confirmed by a failing test, and the finished Badge component rendered on the pricing page"></video>
+
+*An animated illustration of a run in the app, ending with the component it built (not a screen recording).*
+
+## Built around the weak spots of local models
+
+<CardGrid>
+  <Card title="Small tasks" icon="list-format">
+    A planner splits the request into tasks of at most a few files each, so a 16K context window holds the task,
+    its files and the answer.
+  </Card>
+  <Card title="Your own checks" icon="approve-check">
+    Every change is proven by your project's type check, lint, build and tests. A gate that fails at baseline is
+    compared, not blocking.
+  </Card>
+  <Card title="Evidence-gated review" icon="magnifier">
+    A claim becomes a finding only when a test the harness runs fails because of it. Everything else is a
+    question, clearly marked.
+  </Card>
+  <Card title="Every rejection explained" icon="document">
+    Broken JSON, wrong edits and hallucinated APIs are thrown away and asked again, each with a reason code the
+    report counts.
+  </Card>
+</CardGrid>
+
+AstroJS is the first supported stack. Any OpenAI-compatible endpoint works: LM Studio, Ollama, llama.cpp's server,
+vLLM, or a hosted API. The harness is Ruby with zero gems, and Apache-2.0.
+
+<CardGrid>
+  <LinkCard title="Install" href="/start/install/" description="Ruby 3.3, git, and a model server." />
+  <LinkCard title="Cookbook: an Astro landing page" href="/cookbook/astro-landing-page/" description="From an empty folder to a merged branch with a local 16K model, every decision explained." />
+  <LinkCard title="How it works" href="/start/how-it-works/" description="Intake, planning, the task loop, integration and the final review." />
+  <LinkCard title="Need help?" href="/need-help/" description="Custom setups, private stacks and fine-tunes." />
+</CardGrid>

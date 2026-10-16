@@ -1,0 +1,102 @@
+/* SPDX-License-Identifier: Apache-2.0 */
+/* Copyright 2026 V and Bruno LLC */
+/* The harness app's palette (lib/harness/ui/public/app.css) mapped onto Starlight. Dark only. */
+
+:root,
+:root[data-theme="dark"] {
+  /* harness names */
+  --vb-bg: #0b0b0d;
+  --vb-bg-sidebar: #0f0f12;
+  --vb-surface: #16161a;
+  --vb-surface-hover: #1f1f25;
+  --vb-border: #2b2b33;
+  --vb-accent: #5809e0;
+  --vb-accent-hover: #6105ff;
+  --vb-accent-soft: #ddcbff;
+  --vb-text: #fafafa;
+  --vb-muted: #a3a3ad;
+  --vb-success: #3ddc97;
+  --vb-danger: #ff5c7a;
+
+  /* Starlight */
+  --sl-color-accent-low: #1d0d42;
+  --sl-color-accent: var(--vb-accent);
+  --sl-color-accent-high: var(--vb-accent-soft);
+  --sl-color-white: var(--vb-text);
+  --sl-color-gray-1: #ececf1;
+  --sl-color-gray-2: #cfcfd8;
+  --sl-color-gray-3: var(--vb-muted);
+  --sl-color-gray-4: #6b6b78;
+  --sl-color-gray-5: var(--vb-border);
+  --sl-color-gray-6: var(--vb-surface);
+  --sl-color-black: var(--vb-bg);
+  --sl-color-bg-nav: var(--vb-bg-sidebar);
+  --sl-color-bg-sidebar: var(--vb-bg-sidebar);
+  --sl-color-hairline: var(--vb-border);
+  --sl-color-hairline-light: var(--vb-border);
+  --sl-color-hairline-shade: #08080a;
+  --sl-color-green: var(--vb-success);
+  --sl-color-red: var(--vb-danger);
+
+  --sl-font: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --sl-font-mono: ui-monospace, "SF Mono", Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+
+::selection { background: var(--vb-accent); color: #fff; }
+body { background: var(--vb-bg); }
+
+/* headings: the app's weight and tracking */
+.sl-markdown-content :is(h1, h2, h3, h4),
+h1#_top { font-weight: 600; letter-spacing: -0.01em; }
+
+/* links: lavender, like the app */
+.sl-markdown-content a:not(:where(.not-content *)) { color: var(--vb-accent-soft); text-underline-offset: 3px; }
+.sl-markdown-content a:not(:where(.not-content *)):hover { color: #fff; }
+
+/* the active sidebar entry is the app's active chat: a solid violet block */
+.sidebar-content a[aria-current="page"],
+.sidebar-content a[aria-current="page"]:hover {
+  background: var(--vb-accent);
+  color: #fff;
+  border-radius: 3px;
+  font-weight: 500;
+}
+.sidebar-content a { border-radius: 3px; }
+.sidebar-content a:not([aria-current="page"]):hover { background: var(--vb-surface-hover); }
+
+/* buttons: square-ish, like the app's */
+.sl-link-button, .action { border-radius: 3px !important; }
+.sl-link-button.primary, .action.primary { background: var(--vb-accent); border-color: var(--vb-accent); color: #fff; }
+.sl-link-button.primary:hover, .action.primary:hover { background: var(--vb-accent-hover); border-color: var(--vb-accent-hover); }
+
+/* screenshots and diagrams sit on a hairline frame */
+.sl-markdown-content img { border-radius: 4px; border: 1px solid var(--vb-border); }
+
+/* tables and inline code on the app's surfaces */
+.sl-markdown-content table { border-radius: 4px; }
+.sl-markdown-content :not(pre) > code { background: var(--vb-surface); border: 1px solid var(--vb-border); border-radius: 3px; padding: 0.1em 0.35em; }
+
+/* the splash page's glow, as in the demo */
+.hero { position: relative; }
+[data-has-hero] .page {
+  background: radial-gradient(ellipse 60% 420px at 50% 0, rgba(88, 9, 224, 0.28), transparent 70%), var(--vb-bg);
+}
+
+/* the footer's lead line */
+.vb-lead { margin-top: 1.5rem; padding-top: 1.25rem; border-top: 1px solid var(--vb-border); color: var(--vb-muted); font-size: var(--sl-text-sm); }
+.vb-lead a { color: var(--vb-accent-soft); text-decoration: none; font-weight: 500; }
+.vb-lead a:hover { color: #fff; }
+
+/* the demo video on the home page */
+.vb-video { width: 100%; height: auto; border-radius: 6px; border: 1px solid var(--vb-border); display: block; background: var(--vb-bg); }
+
+/* the phone menu button: the app's square dark button, not a white circle */
+.sl-menu-button {
+  border-radius: 3px !important;
+  background-color: var(--vb-surface) !important;
+  color: var(--vb-text) !important;
+  border: 1px solid var(--vb-border) !important;
+  box-shadow: none !important;
+}
+.sl-menu-button:has(~ :popover-open) { background-color: var(--vb-accent) !important; border-color: var(--vb-accent) !important; }
