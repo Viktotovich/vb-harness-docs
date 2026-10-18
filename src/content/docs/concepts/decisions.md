@@ -461,3 +461,172 @@ it was before any edit, while its retried edits were applied after the accepted 
 the task was blocked. Now the edit rules say that edits to one file apply in order and must not overlap, and
 that a small file can be rewritten whole instead. When a retry is needed, it includes each file with refused edits
 as the accepted edits left it (fenced, up to 12,000 characters in all), and says to copy the search text from that.
+
+## A build can be stopped from the app
+
+During a long live run the only way to stop a build was to kill the app, which left `run.json` saying `running`
+until a resume. The Stop button now also shows while the open chat's build is running, and sends
+`POST /api/runs/:id/stop` (token and same-origin, like every POST). That only sets a flag on the run's thread; the
+run checks it at safe points: before each task, before integration and before the final review. It never cuts a
+task short, so the task in progress still commits or blocks as usual, and a stop can take as long as that task.
+The remaining tasks are recorded as skipped ("stopped by the user"), the run ends `stopped` with exit code 2 (as a
+model outage does), and the report is written. `harness resume RUN_ID` runs the skipped tasks, then integration
+and the final review; committed tasks keep their outcome. The card shows "Stopping after the current task…" until
+then, and "stopped" with the resume command after.
+
+## A gate that cannot run blocks only when the task depends on it
+
+A field report: `lint` was in `alwaysGates`, eslint was not installed, and every task was blocked with "lint could
+not run" after zero fix rounds, so the model's real type error was never sent back. Touched-file gates such as lint
+and format are not in the baseline (they need the task's files), so the integration rule ("skipped at intake
+too") did not cover them. Now a skipped gate does not block when the task does not name it in its acceptance and it
+did not run at intake: it is recorded as a `skipped` event ("could not run, not blocking") and the gates that did
+run get their fix rounds. A gate the baseline skipped is not run again for each task. A gate the task names, one
+that ran at intake, and one the stack does not define still block.
+
+## A planner reply that cannot be used is one more round, and a failed plan says so
+
+A field run died at planning: the first plan was cut off, the client's retry with thinking off returned invalid
+JSON, and the run aborted. With `--json`, stdout was empty, and `run.json` was left at `planning`. Now a planner
+reply that cannot be used (cut off, not JSON, the wrong shape) counts as a replan round: the next prompt says what
+went wrong and asks for a shorter plan. When the rounds run out, the run ends `failed` with the reason in
+`run.json`, the CLI prints it (and `--json` prints the result with an `error` field), and the exit code stays 1,
+which the README now describes as "the run failed".
+
+## A test item must name a test file
+
+A field plan proved an `.astro` page with `{"kind": "test", "path": "src/pages/admin/index.astro", "write": true}`:
+the page itself as its test. The plan check accepted it, and the unit gate then ran the test runner on a page. Now
+a test item whose path does not look like a test file (a `.test.`/`.spec.` or `_test`/`_spec` name, or a file under
+`tests/`, `test/`, `__tests__/`, `spec/` or `e2e/`) is refused as `plan.not_a_test_file`, and the planner prompt
+says to give a test file, never the file under test.
+
+## A task may create again a file it created itself
+
+A field run blocked a task on `edit.create_exists` twice: on a retry, the model created a file the same task had
+created in an earlier attempt. Edits now take the files this task has already created (kept in its state, so they
+survive a resume) and allow a whole-file create over those. Any other existing file is still refused unless it is
+small and listed in `files.modify`, so one task cannot overwrite a file another task created.
+
+## A new file has to fit in one reply
+
+A field task created one 250-line file. The implementer's reply was cut off at `maxOutputTokens`, the retry with
+thinking off returned no edits, and the task was blocked as a shape problem (`model.schema_mismatch`) after two
+calls. Doubling the allowance did not help. Three changes, none tied to a model:
+
+- The planner prompt says how long a new file may be: half the implementer profile's output allowance (the rest is
+  for thinking and the JSON around it) at about 40 bytes a line, so 150 lines at 4,000 tokens. Bigger modules are
+  split into several files and tasks.
+- When a reply runs out of room and the retry with thinking off fails in another way, the error keeps the
+  out-of-room reason and both messages, so the cause is not reported as a shape problem.
+- A task that creates files and is blocked that way says what to do: split the file, or raise `maxOutputTokens`.
+
+## Cut-off replies and thinking are counted
+
+A field report's Cost table showed 59 tokens out for two implementer calls that took nearly five minutes: both
+replies were cut off, the server sent no usage, and only the tiny answers were counted. Now a reply cut off at the
+length limit (`finish_reason=length`, or a server error saying the output was incomplete) counts its whole output
+allowance, since that is what the model generated. Thinking is counted separately when the server reports it
+(`completion_tokens_details.reasoning_tokens`) or estimated from the reasoning text it returns. Request records
+carry `usage.thinking`, and the report's Cost table has an "Of which thinking" column and a note on how the counts
+are made.
+
+## Review can be light or off, and the verifier has a budget
+
+In a field run the review cost about four times as much as implementing and fixing combined: on one three-file
+task the verifier made 68 calls (222K tokens in, 48 minutes) and found nothing, after six claims in a row were
+refuted. Two changes:
+
+- **`review`** in the config: `full` (the default, as before), `light` (skips the per-task review of a change of
+  80 changed lines or fewer whose gates passed first time; the final review still runs) or `off`.
+- **Caps, in every mode.** `maxVerifierCalls` (60 per run, counted by the client) and `maxRefutedInARow` (3): the
+  verifier checks them before each batch of claims and before the support and challenge steps of an accepted
+  claim. Claims it stops on are recorded as abstained with the reason, and the report lists them under Questions
+  as "Not verified", so none is silently dropped.
+
+## Default gates run npx offline
+
+A field report: with eslint and playwright missing, `npx eslint` and `npx playwright` asked npm to fetch them from
+the registry (the prompt was cancelled, so nothing was installed). The default gates in `config.example.json` now
+run `npx --offline --no -- <tool>`: an installed tool runs from `node_modules`, and a missing one fails at once
+with `ENOTCACHED`, without a download or a network request. The runner reads that error as "tool not installed",
+so the gate is skipped. Existing configs keep their own gates; `harness init` writes the new ones.
+
+## Gates that cannot run here, and advisory gates
+
+Two field reports. An application-control policy blocked Astro's native compiler binary, so its gates failed for a
+reason the model could not fix; and prettier without its Astro plugin failed with "No parser could be inferred" on
+every `.astro` file. The runner now reads output like "An Application Control policy has blocked" and "No parser
+could be inferred" as a gate that could not run here (`skipped`, with the reason), not as a failure of the code. As
+with a missing tool, it blocks a task only when the task names that gate.
+
+Also, a failing non-blocking gate (`format`, by default) never stopped a task but was counted as a rejected output
+on every task. It is now recorded as `skipped` with "advisory, not blocking" and the problems, so it shows in the
+events without inflating the rejection rate.
+
+## A red baseline is said up front, and can stop the run
+
+A field run's baseline type check failed (a missing `@types` package), and the run planned and implemented anyway,
+so every task's type check output was noisy and nothing said why. Now intake records each blocking gate that fails
+or times out before the run: an event (`gate.failed:<gate>`, "fails before the run (N problems)"), `run.json`'s
+`baselineFailing`, and a line at the top of the report. Tasks are still judged only on new problems. With
+`requireGreenBaseline` (or `harness run --require-green-baseline`) the run stops after intake, before any model
+call, with exit code 2 and the gates named.
+
+## A request the harness gives up on
+
+A field report saw the model server at full CPU after a run had ended, with no harness process left, and a dev
+server then failed to start. On a timeout the harness's HTTP client already closes its connection (Net::HTTP's block
+form), which stops servers that watch for a closed client; this server did not. Cancelling on the server side would
+need a server-specific endpoint, which does not belong in `lib/` (I1). So the harness now says what happened: the
+timeout error names the timeout and says the server may keep working, a test checks that the stub server sees the
+client go away, and the README's troubleshooting table explains the symptom.
+
+## Stray commas in a model's JSON are repaired
+
+A field run blocked a task on `model.invalid_json` at the first attempt. Before giving up on a reply, the client
+now tries repairs that cannot change what it means: a comma before a closing `}` or `]`, and a doubled comma, with
+text inside strings never touched. A cut-off reply is not completed and a missing quote is not guessed, since
+either could turn half an edit into an accepted one; those still fail, and the usual retry with thinking off
+follows. A repaired reply still goes through the same schema and parser checks.
+
+## Stack fix hints and review notes are config data
+
+A field run's fixer could not repair `Cannot find name 'props'` in Astro frontmatter (it should be `Astro.props`):
+three of six components were blocked after two identical fix rounds, while the same model got it right in the other
+three. Its review abstained on "raw interpolation" because it could not confirm that Astro escapes `{expr}`, and
+missed a route that crashed on a primitive JSON body. Knowledge like this is about the stack, not the harness, so
+it is configuration: a stack's `fixHints` (a text to find in a diagnostic, and the hint shown next to it in the
+fix prompt) and `reviewNotes` (facts and common mistakes, added to the reviewer's rules and the verifier's prompt
+as notes from the configuration). The example's Astro stack ships four hints and five notes; `lib/` stays
+stack- and model-neutral (I1).
+
+## The planner sees the installed packages
+
+A field planner asked a blocking question built on a false claim ("there is no vitest dependency in package.json")
+while vitest was installed: it only saw the file list, not what the project depends on. The planner's overview now
+includes the `dependencies` and `devDependencies` of the root `package.json` (name, version, and "(dev)"; at most
+80), fenced as repository data, with "plan only with these, never an install".
+
+## Syntax errors get a whole-file rewrite; observable behaviour gets a test
+
+Two field findings. An unclosed `{ ... .map(...) }` in an `.astro` page gave "Cannot find name 'post'" and
+"Unterminated regular expression literal", and search-and-replace fixes left the same errors. The fix prompt now
+says to rewrite a small file whole on syntax errors (an unterminated or unexpected token, an unclosed expression or
+tag) rather than guess search text. And two bugs passed type check, build and review: settings fields that never
+called `onChange`, so edits never saved, and a route that answered 500 to a malformed body. When tests can run, the
+planner is told to add a test item for each behaviour someone can observe (saving, what an API returns for good
+and bad input, what a click changes), since type checks and builds cannot see it.
+
+## Task files are written as bytes
+
+On Windows every line of a `blocked.patch` ended in CRLF, and `git apply` warned about trailing whitespace on each
+one. The patch itself was LF; Ruby's text-mode `File.write` added the CR. Task files given as text (patches,
+excerpts) are now written with `File.binwrite`, so they keep the line ends they have.
+
+## A hand-written plan can come with its request
+
+A field run worked around a failed planner by writing `plan.json` by hand, but `--from-plan` and `--request` were
+exclusive, so the run lost the request, which the implementer, fixer and reviewers use for exact values. Both can
+now be given: the plan runs as written (and is checked like a planner's), and the request is saved as
+`request.md` and shown as context. Giving neither is the only usage error. The README documents the plan format.

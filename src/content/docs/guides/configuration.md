@@ -33,25 +33,42 @@ sidebar:
 Use two profiles to plan and review with a larger model and implement with a faster one. `HARNESS_<PROFILE>_BASE_URL`
 and `HARNESS_<PROFILE>_MODEL` override a profile from the environment.
 
-**Stacks** say how to check a project. The Astro stack in the example:
+**Stacks** say how to check a project. The Astro stack in the example (each command runs as
+`npx --offline --no -- <tool>`, so a tool that is not installed fails at once and npx never downloads one):
 
 | Gate | Command | When | Blocking |
 | --- | --- | --- | --- |
-| `format` | `npx prettier --check {files}` | each task, touched files | no |
-| `lint` | `npx eslint {files}` | each task, touched files | yes |
-| `typecheck` | `npx astro check` | each task | yes |
-| `unit` | `npx vitest run {tests}` | tasks with tests | yes |
-| `build` | `npx astro build` | integration | yes |
-| `e2e` | `npx playwright test {tests}` | integration | yes |
+| `format` | `prettier --check {files}` | each task, touched files | no |
+| `lint` | `eslint {files}` | each task, touched files | yes |
+| `typecheck` | `astro check` | each task | yes |
+| `unit` | `vitest run {tests}` | tasks with tests | yes |
+| `build` | `astro build` | integration | yes |
+| `e2e` | `playwright test {tests}` | integration | yes |
 
-Gates are argv arrays, never shell strings. A gate whose tool is missing is reported as **skipped**, never as passed.
+Gates are argv arrays, never shell strings. A gate whose tool is missing is reported as **skipped**, never as passed;
+it blocks a task only when the task names it in its acceptance.
 Gates may not install packages, run `git` or `gh`, or use `npx --yes`. Other stack keys: `detect` (files that
 identify the stack), `alwaysGates`, `protectedPaths` (globs the model may never touch; `.git`, `.husky` and
 `node_modules` are always protected), `dependencyDirs`, and `docs.local` (a local checkout of the framework's docs,
 used by the review; without it, framework claims abstain instead of being confirmed).
+Two keys carry what a small model gets wrong about the stack, as plain data: `fixHints` (`{"match": text in a
+diagnostic, "hint": what to tell the fixer}`, shown next to a matching diagnostic) and `reviewNotes` (facts and
+pitfalls the reviewer and verifier are given). The example's Astro stack has a few, such as "props are
+`Astro.props`" and "`{expression}` output is escaped"; add your project's own.
 
 **Limits** (defaults): `maxFilesPerTask` 3, `maxFixRounds` 3, `maxReplanRounds` 2, `maxDiagnostics` 20,
-`maxLookups` 6, `maxReviewFixTasks` 2, `wholeFileRewriteMaxBytes` 4096, `maxGateOutputBytes` 204800.
+`maxLookups` 6, `maxReviewFixTasks` 2, `wholeFileRewriteMaxBytes` 4096, `maxGateOutputBytes` 204800,
+`maxVerifierCalls` 60 (per run), `maxRefutedInARow` 3.
+
+**Review** (`review`, default `full`): `full` reviews every task and the whole run; `light` skips the per-task
+review of a small change (80 changed lines or fewer) whose gates passed first time, and keeps the final review;
+`off` skips review. In every mode the verifier stops when the run has used `maxVerifierCalls`, or after
+`maxRefutedInARow` claims in a row were refuted by the code; the claims left are recorded as unverified
+questions, never dropped. Review is the most expensive stage with a small model, so `light` is a good start.
+
+**A red baseline.** When a blocking gate already fails before the run, intake says so (an event, and a line at the
+top of the report); tasks are still judged only on new problems. Set `requireGreenBaseline` to `true` to stop the
+run there instead, before any model call (exit code 2).
 
 `gateEnvAllow` lists extra environment variables your gates need; everything that looks like a secret is removed
 from the gates' environment otherwise.
