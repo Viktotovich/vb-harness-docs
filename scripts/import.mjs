@@ -20,6 +20,7 @@ const pub = join(root, "public", "media");
 
 // Which README sections make which page, in sidebar order within each group.
 const PAGES = [
+  { slug: "start/fastest-path", title: "Fastest path", sections: ["Fastest path"] },
   { slug: "start/how-it-works", title: "How it works", sections: ["How it works"] },
   { slug: "start/install", title: "Install", sections: ["Requirements", "Install"] },
   { slug: "start/the-app", title: "Quick start: the app", sections: ["Quick start: the app"] },

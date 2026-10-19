@@ -630,3 +630,26 @@ A field run worked around a failed planner by writing `plan.json` by hand, but `
 exclusive, so the run lost the request, which the implementer, fixer and reviewers use for exact values. Both can
 now be given: the plan runs as written (and is checked like a planner's), and the request is saved as
 `request.md` and shown as context. Giving neither is the only usage error. The README documents the plan format.
+
+## Missing dependencies stop the run at intake
+
+A run on a repository without `npm install` skipped every gate as "tool not installed"; the plan check then refused
+each task that needed one, and the cause only showed at the end. Intake now checks that every `dependencyDirs`
+folder exists in the user's checkout, before the worktree is made (so a stop leaves no branch behind), and stops
+with the install command to run: the configured `packageManager`, or the one the lockfile names, or npm. The harness
+still installs nothing itself (I10).
+
+## --help lists only commands that exist
+
+`--help` listed `probe`, `cleanup` and `push`, which are planned (DESIGN.md 11.1) but not built, so a first try
+of any of them only printed "not implemented yet". Help now lists the built commands with a line on what each
+does; the planned ones are not listed, and still say so when typed.
+
+## init offers modes and a second model
+
+`harness init` copied every setting but the server's from the example, so each new config got `review: "full"`
+and one model for every role, and the settings that change a run the most went unnoticed. It now asks for a
+mode, Careful, Balanced (the default) or Quick, which writes `review`, `requireGreenBaseline` and `maxFixRounds`,
+and an existing config whose values match no mode can keep them. Then it asks for one model or two: with two, a
+`planning` profile serves the planner, reviewer and verifier, and the implementer, fixer and summarizer keep
+`default`. Picking the first model again counts as one model.
