@@ -67,6 +67,9 @@ anchorPage.set(githubSlug("Cookbook: an Astro landing page"), "/cookbook/astro-l
 
 function rewrite(md, sourceDir, pageSlug) {
   const pageDir = join(docs, dirname(pageSlug));
+  // A link around an image ([![alt](poster)](video)) hides its outer target from the pattern below; videos are
+  // served as they are, so point those at /media/ first.
+  md = md.replace(/\]\((?:\.\.\/)*docs\/media\/([^)\s]+\.(?:mp4|webm))\)/g, "](/media/$1)");
   return md.replace(/(!?)\[([^\]]*)\]\(([^)\s]+)\)/g, (all, bang, text, href) => {
     if (/^(https?:|mailto:)/.test(href)) return all;
     if (href.startsWith("#")) {

@@ -23,3 +23,7 @@ what to do: a project without its dependencies installed (run `npm install` in i
 
 On the command line instead, `ruby exe/harness init` asks a few questions (Enter accepts each default), and
 `ruby exe/harness run --repo ../my-site --request request.md` builds what `request.md` describes.
+
+[![An animated walkthrough of a run: a request, the live progress card, rejected outputs and why, the evidence-gated review, a claim confirmed by a failing test, and the finished Badge component rendered on the pricing page](/media/demo-preview.webp)](/media/demo.mp4)
+
+*An animated illustration of a run in the app, ending with the component it built, rendered (not a screen recording). Click it for the 1080p, 60 fps video.*
