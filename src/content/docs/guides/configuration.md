@@ -66,8 +66,8 @@ review of a small change (80 changed lines or fewer) whose gates passed first ti
 `maxRefutedInARow` claims in a row were refuted by the code; the claims left are recorded as unverified
 questions, never dropped. Review is the most expensive stage with a small model, so `light` is a good start.
 
-**Modes.** `harness init` asks how careful runs should be and writes the matching settings, which you can still
-edit afterwards:
+**Modes.** `harness init` asks how careful runs should be, and the app's Settings can change it later; either
+writes the matching settings, which you can still edit by hand:
 
 | Mode | `review` | `requireGreenBaseline` | `maxFixRounds` | For |
 | --- | --- | --- | --- | --- |
@@ -77,7 +77,8 @@ edit afterwards:
 
 It also asks whether to use one model for everything, or a second model (often a larger one) for the planner,
 reviewer and verifier, with the implementer and fixer on the first. That writes a `planning` profile and points
-those `roles` at it.
+those `roles` at it. In the app, **Plan & review** on a model does the same, and Settings picks which configured
+model those roles use. A config the app creates starts Balanced, like one from `init`.
 
 **A red baseline.** When a blocking gate already fails before the run, intake says so (an event, and a line at the
 top of the report); tasks are still judged only on new problems. Set `requireGreenBaseline` to `true` to stop the

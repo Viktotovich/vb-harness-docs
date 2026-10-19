@@ -17,7 +17,10 @@ This starts the local app on `http://127.0.0.1:4567/` and, on first start, opens
    start LM Studio's server, load a downloaded model, or pull an Ollama model, each with one click. For any other
    server, enter its OpenAI-compatible URL and, if it needs a key, the *name* of the environment variable that holds
    the key (never the key itself). Choose **Use** on a model: the harness probes it and tells you what it found, for
-   example "16K context, JSON mode: yes, tools: no, thinking can be turned off".
+   example "16K context, JSON mode: yes, tools: no, thinking can be turned off". Once a model is set up, the top of
+   Settings has **How runs work**: the [mode](/guides/configuration/) (Careful, Balanced or Quick), and which model the
+   planner, reviewer and verifier use. **Plan & review** on any model makes it that second model, even on the same
+   server as the first.
 
    ![Settings · providers: the app looks for LM Studio and Ollama on this machine; a custom OpenAI-compatible server at 127.0.0.1:8080 has been checked and offers one model to use](../../../assets/media/app-connect-a-model.png)
 2. **Chat.** Chat mode is a planning conversation: work out what to build, compare approaches, sketch the steps.
