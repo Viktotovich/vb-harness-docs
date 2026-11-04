@@ -80,9 +80,52 @@ reviewer and verifier, with the implementer and fixer on the first. That writes 
 those `roles` at it. In the app, **Plan & review** on a model does the same, and Settings picks which configured
 model those roles use. A config the app creates starts Balanced, like one from `init`.
 
+**Agent mode** (`"mode": "agent"`, or `--mode agent`) trades speed for accuracy. Instead of one structured
+reply per step, each task is worked by an agent with tools: it reads, lists and searches the code, edits files
+(exact search-and-replace, whole files, and long new files in parts), and runs the project's gates and the
+commands you allow, until it calls `finish`. Its finish is a claim, not a result: the harness then runs the task's
+gates itself, and sends any failure back to the same agent, which keeps what it already read, until the gates
+pass or `agent.maxRounds` runs out. Before planning, an investigating agent reads the repository (it cannot change
+files) and its findings go to the planner, so plans and bug fixes start from the code as it is. Tasks may change
+up to `agent.maxFilesPerTask` files.
+
+The safety rules do not change. Writes stay in the worktree and outside `protectedPaths`; tool output is fenced as
+untrusted; only gates mark a task done. The agent runs only the stack's gates and the commands you declare under
+`agent.commands`, by name: an argument written exactly as `{name}` is filled from a declared parameter, either
+`path` (an existing file in the repository) or `word` (letters, digits and `. _ : / @ -`, never starting with
+`-`, and never an absolute path, drive letter or `..`). The model never writes a command line. Check configuration
+(`package.json`, `tsconfig*.json`, `*.config.*`, linter configs and the like) and tests that already exist can be
+changed only when the plan names them, so an agent cannot make a gate pass by weakening it.
+
+| Key | Default | What it does |
+| --- | --- | --- |
+| `agent.maxSteps` | 60 | Tool calls per stretch of a task's work. |
+| `agent.maxRounds` | 6 | How often the harness may send a task back after its gates failed. |
+| `agent.maxFilesPerTask` | 12 | Files one task may change (replaces `maxFilesPerTask` in agent mode). |
+| `agent.investigate` | `true` | Explore the repository before planning. |
+| `agent.maxInvestigateSteps` | 30 | Tool calls for that exploration. |
+| `agent.commands` | `{}` | Named commands the agent may run, as above. |
+| `agent.askTimeoutSec` | 900 | How long an agent's question waits for your answer; 0 means it cannot ask. |
+
+**Steering a running agent.** While an agent-mode run works, `harness steer RUN_ID "use the existing Button
+component"` (or the note box on its card in the app) sends it a note, which the agent reads before its next step,
+as your words. An agent can also ask you a question with `ask_user` when the task is ambiguous: the question shows
+on the card, in the events and in `run.json`, and your next note is the answer. If none comes within
+`agent.askTimeoutSec`, the agent decides for itself and says in its summary what it assumed. In the app, Settings
+switches the way of working between Pipeline and Agent, and an agent-mode card's details list each agent's steps.
+
+Agent mode makes many more model calls than the pipeline; with a local model, expect a task to take several
+times longer. Models without native tool calls use a JSON reply protocol, one tool per reply.
+
 **A red baseline.** When a blocking gate already fails before the run, intake says so (an event, and a line at the
 top of the report); tasks are still judged only on new problems. Set `requireGreenBaseline` to `true` to stop the
 run there instead, before any model call (exit code 2).
+
+**A dry run** (`harness run --dry-run`, or `"dryRun": true` for every `run` on the command line) shows what a run
+would start from without calling a model: the stack, each gate's baseline result, the plan's problems when a plan
+is given (all but the context-size check, which needs the model), and what would happen next. It exits 0 when
+nothing found would stop a real run, 1 for plan problems, 2 for a failing baseline under `requireGreenBaseline`.
+The app's Build is never a dry run.
 
 `gateEnvAllow` lists extra environment variables your gates need; everything that looks like a secret is removed
 from the gates' environment otherwise.

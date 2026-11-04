@@ -662,3 +662,121 @@ moved to `Harness::Modes`, which `init` and the app share. Settings now opens wi
 modes, and a picker for the profile the planner, reviewer and verifier use (the implementer's own, or any other
 configured one). **Plan & review** on a model writes it as the `planning` profile, so a second model can sit on
 the same server as the first. A config the app creates starts Balanced, as one from `init` does.
+
+## Intake reports every problem at once
+
+Intake stopped at the first problem it found: uncommitted changes, then, once those were committed, missing
+dependencies, then a repository no stack matches. Each cost a restart. It now checks all three in the user's
+checkout before the worktree exists and reports them together, one per line. A single problem keeps its own error
+and message, so a dirty tree alone is still a git error with the same text.
+
+## dryRun does what it says
+
+`dryRun` was accepted and validated in the config but read nowhere, so setting it changed nothing. `harness run
+--dry-run` (or `"dryRun": true`) now runs intake, the baseline gates and, with a plan, the plan checks, then
+stops before any model call: no probe, no planner. The context-size check is skipped because it needs the
+model's limits. The worktree is removed afterwards (the branch stays, like every run's, since the git allowlist
+has no branch deletion), the run ends `dry_run`, and `resume` refuses it. The app's Build ignores the key, so a
+config shared with the app cannot silently turn every build into a dry run.
+
+## Runs record what produced them
+
+A field run crashed after its prompt files were edited mid-run, and `resume` had no way to notice. Intake now
+writes an `identity` to `run.json`: the harness version, a digest of every prompt file, and a digest of the
+effective config without the command-line overrides (`--review`, `--require-green-baseline`). `answer` and
+`resume` compare it with the current one. A different harness version or different prompts stop the run with
+both values named, unless `--accept-changes` is given; the rest of the run would otherwise run on different code
+or instructions than its first part. A changed config only adds an event, because raising `timeoutSec` and
+resuming is the documented fix for timeouts. After a check the identity is updated, so the next resume compares
+against what ran last; runs from before this change get one on their first resume.
+
+## The report says first what its numbers do not show
+
+A report with every task done reads as a clean run even when the lint gate never ran for a missing tool, review
+was off, or the config changed while the run was paused. Those facts were in `baseline.json`, the config and the
+events, but not in the report. A **Read this first** section now opens the report when any applies: a gate that
+could not run, review `off` or `light`, a failed or stopped run (with the resume command), a dry run, and each
+identity change accepted on resume. Each line says what to do. The review mode is recorded in `run.json` at the
+start and on each resume, since the report is built from the run's files only.
+
+## harness doctor and Check setup
+
+The reasons a run would not start were found one at a time: no config, then a server that did not answer, then a
+dirty tree, then missing dependencies, each at a different stage. `harness doctor [--repo PATH]` and **Check
+setup** in Settings now look for all of them in one pass: Ruby and git; the config; for each profile a role uses,
+that its key's variable is set, its server answers and lists the model; and with a repository, the same checks
+intake runs plus whether each gate's tool is there (for `npx -- tool`, in `node_modules/.bin`). Each problem
+says what to do; the exit code is 0 when ready and 2 otherwise. Doctor writes, installs and starts nothing, and
+asks a server only for its model list, so it costs no tokens; whether the model's output is usable is still only
+learned by a run. It replaces the planned `probe` command. A non-blocking gate without its tool is reported but
+is not counted as a problem.
+
+## harness demo and Try the demo
+
+Nothing worked until a model was connected, so a first look at the harness needed a model server, a model and a
+project. `harness demo` and **Try the demo** in Settings now run the real pipeline on a bundled project with a
+scripted model: a small OpenAI-compatible server on 127.0.0.1 that answers each step as a good model would (a
+plan of two tasks, a first edit that fails the project's check, the fix, a review that finds nothing) and answers
+the capability probe with plain text. The project's check is a Ruby script, so no Node is needed. Everything
+lives in `demo/` next to the config: its own config, runs and project, so the user's config and runs are never
+touched, and the demo's commits carry their own author, so it works before git knows who the user is. The run is
+marked as a demo and its report says so first. In the app the demo is a build card in a chat like any other.
+
+## Agent mode: an agent inside the pipeline, not a second harness
+
+The pipeline asks for one structured reply per step, which keeps weak local models on rails but cannot
+investigate a bug, follow a change through many files, or check its own work before handing it in. Agent mode
+puts a tool-using agent where that reply was, and keeps everything around it: intake, the worktree, the baseline,
+the gates, review, commits, resume, events and the report. A separate agentic harness would have had to rebuild
+all of that, and its safety, a second time.
+
+An investigating agent, which can read and run checks but not write, explores the repository before planning;
+its findings reach the planner fenced, as model output. Each task is then worked by an agent with tools to read,
+list, search, find symbols, edit (exact replace, whole files, and long new files in parts through `append_file`),
+view its diff, run the stack's gates and run commands declared in config. The agent's `finish` is a claim: the
+harness runs the task's gates itself (I7) and sends a failure back into the same conversation, so the agent keeps
+what it read, for up to `agent.maxRounds` rounds. Review and its follow-up fix tasks work as before. An agent that
+runs out of steps without finishing blocks its task; unfinished work is never offered to the gates as done.
+
+The invariants hold by construction. Every write goes through `Task::Edits`, so I2 and `protectedPaths` apply.
+Commands are declared in config with fixed argv; the model picks one by name and fills declared parameters, each
+checked by kind (a path must exist in the worktree; a word allows no shell characters and cannot start with `-`),
+so no model ever writes a command line (I3). Commands run through `Gates::Runner`, one of the places allowed to
+start processes (I4), with the scrubbed environment (I5). Every tool result is fenced (I9). Models without native
+tool calls use a JSON protocol, one tool per reply, and are never offered tools. Older tool results are cut to one
+line when the conversation outgrows half the context, so long tasks still fit.
+
+## What an agent may not touch
+
+A review before merging agent mode found four ways its reach could be misused, all closed before it landed. A
+`word` parameter could name a file outside the worktree (`/etc/passwd`, `C:/...`, `..`) as a command argument:
+words may no longer start with `/` or `~`, name a drive, or contain `..`. An agent could make a failing gate pass by
+editing what the gate checks against (`tsconfig.json`, a test runner's config, `package.json`) or an existing test:
+outside the files the plan names, those writes are refused, so the gates keep judging the code rather than being
+adjusted to it (I7). `read_file` refuses files over 2 MB instead of loading them, and `list_dir` no longer shows the
+names of protected files.
+
+## Steering an agent while it works
+
+An agent works for many steps, and a pipeline-style "answer the planner, then wait" cannot steer that. Notes go
+to `runs/<id>/notes.jsonl`, written by `harness steer` (from another terminal) or the app's note box, and the
+session adds new ones to the agent's next prompt as the user's words: they are the user's, so they are not fenced
+as untrusted. Which notes the agent has seen is kept in `run.json` (`notesRead`), so each reaches it once, across
+tasks and after a resume. With `ask_user` the agent can ask one question when the task is ambiguous; the run keeps
+going in place (no new run status, so resume and answer are unchanged), shows the question in `run.json`
+(`agentQuestion`), the events and the app, and takes the next note as the answer. Without one within
+`agent.askTimeoutSec`, the agent is told to decide and say what it assumed, so an unattended run never hangs. The
+app also gets a Pipeline / Agent switch in Settings and lists each agent's steps in a card's details.
+
+## A tool without its configuration could not run
+
+The first agent-mode eval on a local model was invalid: the eval project has ESLint but no `eslint.config.*`, ESLint
+9+ stops with an error on any file, and the harness counted that as "lint failed". Every task was sent back to fix
+a problem no code change could fix, and one that had already fixed its real type error was blocked anyway. Two
+changes. The runner now reads "couldn't find an eslint.config" and similar as "the tool has no configuration in
+this project", a gate that could not run (I6), not one that failed. And gates that check touched files, which
+never ran at baseline, get one trial run at intake on one existing source file: one that could not run is
+recorded in the baseline like any skipped gate, so the planner is told, the plan check refuses it, and a task
+that does not name it is not blocked by it. A trial that passes or finds problems is not recorded. A gate configured
+to change files (a formatter with `--write`) would edit the trial's file, so intake undoes any change the trials
+made before a task starts.
