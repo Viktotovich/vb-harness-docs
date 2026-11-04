@@ -11,4 +11,4 @@ sidebar:
   context map and docs.
 - Review evidence uses a local docs checkout only; online docs are not fetched.
 - Gates run your tools on your machine: a gate is as trustworthy as the command you configure.
-- `harness probe`, `cleanup` and `push` are not implemented yet; use `git` directly to push a branch.
+- `harness cleanup` and `push` are not implemented yet; use `git` directly to push a branch.

@@ -16,13 +16,18 @@ cd vb-harness-for-agentic-building
 ruby exe/harness
 ```
 
-The app opens in your browser. In **Settings · providers**, choose **Use** on a model. Switch to **Build**, pick
+The app opens in your browser. To see a whole build before setting anything up, choose **Try the demo** in
+Settings (or run `ruby exe/harness demo`): a scripted model builds a tiny sample project, with a failed check, its
+fix and a review, in under a minute. Then, in **Settings · providers**, choose **Use** on a model. Switch to **Build**, pick
 your project, describe the feature, and send. Two things stop a run before it starts, each with a message saying
 what to do: a project without its dependencies installed (run `npm install` in it first) and uncommitted changes
 (commit or stash them).
 
 On the command line instead, `ruby exe/harness init` asks a few questions (Enter accepts each default), and
 `ruby exe/harness run --repo ../my-site --request request.md` builds what `request.md` describes.
+
+Stuck? `ruby exe/harness doctor --repo ../my-site` (or **Check setup** at the top of Settings) lists every reason a
+build would not start, each with what to do, without changing anything or asking a model to write.
 
 [![An animated walkthrough of a run: a request, the live progress card, rejected outputs and why, the evidence-gated review, a claim confirmed by a failing test, and the finished Badge component rendered on the pricing page](/media/demo-preview.webp)](/media/demo.mp4)
 
