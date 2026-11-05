@@ -27,6 +27,7 @@ const PAGES = [
   { slug: "start/the-command-line", title: "Quick start: the command line", sections: ["Quick start: the command line"] },
   { slug: "guides/projects", title: "Projects and workspaces", sections: ["Projects and workspaces"] },
   { slug: "guides/understanding-a-run", title: "Understanding a run", sections: ["Understanding a run"] },
+  { slug: "guides/figma", title: "Building from a Figma design", sections: ["Building from a Figma design"] },
   { slug: "guides/configuration", title: "Configuration", sections: ["Configuration"] },
   { slug: "guides/choosing-a-model", title: "Choosing and checking a model", sections: ["Choosing and checking a model"] },
   { slug: "guides/using-with-claude", title: "Using with Claude", sections: ["Using with Claude"] },

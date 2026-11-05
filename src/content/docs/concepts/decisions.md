@@ -795,3 +795,29 @@ The same eval had two tasks that passed every gate and failed acceptance, becaus
 it judged to be a default. The planner is now told to keep every requirement as the request states it. The Astro
 stack also gained fix hints for the repeated mistakes: the `glob` loader's name, `astro:content` outside Astro's
 build, and Node imports in a project without Node types. These are stack data, not prompts (I1).
+
+## A tool call the server cannot parse is a bad reply, not an outage
+
+An eval run stopped on a healthy server. A reply hit the output limit inside a tool call, the server could not parse
+the cut-off arguments and answered HTTP 500, and the client treats an HTTP error it does not recognise as the server
+being down, which ends the run. That message now counts as unusable output, like the other server messages about a
+reply: the model is asked once more, and if that fails the task is blocked for that reason, while the run goes on.
+Any other HTTP 500 still means the server is unavailable.
+
+## A Figma design is read once, from links in the request
+
+Requests can link to a Figma frame. The harness could have given the agent a tool for this, but it reads each link
+once at the start of a run and adds an outline to the request instead. Every step of both modes already sees the
+request, so pipeline mode gets the design too, and a model that handles tools badly loses nothing. A design that
+cannot be read stops the run before any model is called, because building without it would be guessing.
+
+Only links in the user's own request are read. A tool that took a URL from a model would let repo content steer it
+to any file the token can see. The outline carries its own fence, because the planner sees a request as the user's
+words and a layer name is not (I9). The token comes from a named env var and goes only into the request header (I12).
+
+## An agent may fix a test it wrote itself
+
+An agent cannot change tests that existed before its task, or it could make a failing check pass without fixing
+anything. The rule asked only whether the file existed, so a test the agent had just written was refused as well. Two
+eval tasks hit this six times each, wrote new copies of the same test instead, and ran out of steps. A test written in
+the current task now stays editable for that task. To the next task it is an existing test like any other.
