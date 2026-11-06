@@ -106,6 +106,21 @@ changed only when the plan names them, so an agent cannot make a gate pass by we
 | `agent.maxInvestigateSteps` | 30 | Tool calls for that exploration. |
 | `agent.commands` | `{}` | Named commands the agent may run, as above. |
 | `agent.askTimeoutSec` | 900 | How long an agent's question waits for your answer; 0 means it cannot ask. |
+| `agent.maxRecoveries` | 3 | Further tries when an agent stops without finishing; 0 blocks the task at once. |
+| `agent.acceptanceTests` | `false` | A separate agent writes each task's test from the request before the code exists. |
+
+**Acceptance tests.** An implementer's own tests share its misunderstandings. With `agent.acceptanceTests` on, the
+test a task's plan asks for is written first, from the request, by a separate agent on `roles.tester` (the reviewer's
+model unless you set it). The implementer can read that test but not change it. Halfway through `agent.maxRounds`, a
+test the code still fails gets one look from its author, who may correct it only against the request. Work that
+passes such a test counts as done even if the agent never called `finish`. A task with no test in its plan, or a stack
+with no test gate, works as before.
+
+**When an agent stops early.** An agent that runs out of steps, or stops without calling `finish`, gets a limited
+number of further tries, and each one changes something. First a new conversation, told by the harness what is
+already in the repository. Then a smaller job: the harness runs the checks and gives the agent only what is left,
+with half the steps. Then, if `roles.rescuer` names a different profile from `roles.implementer`, that model
+takes over. After that the task blocks, and the report says what was tried.
 
 **Steering a running agent.** While an agent-mode run works, `harness steer RUN_ID "use the existing Button
 component"` (or the note box on its card in the app) sends it a note, which the agent reads before its next step,
