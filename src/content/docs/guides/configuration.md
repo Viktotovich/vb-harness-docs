@@ -23,6 +23,7 @@ sidebar:
     "thinking": { "control": "probe", "effort": "low", "budgetTokens": null },
     "structuredOutput": "probe",  // json_schema | json_object | prompt
     "toolCalls": "probe",         // native | none
+    "continuation": "probe",      // prefill | continue_final_message | none
     "timeoutSec": 900
   }
 },
@@ -59,6 +60,13 @@ pitfalls the reviewer and verifier are given). The example's Astro stack has a f
 **Limits** (defaults): `maxFilesPerTask` 3, `maxFixRounds` 3, `maxReplanRounds` 2, `maxDiagnostics` 20,
 `maxLookups` 6, `maxReviewFixTasks` 2, `wholeFileRewriteMaxBytes` 4096, `maxGateOutputBytes` 204800,
 `maxVerifierCalls` 60 (per run), `maxRefutedInARow` 3.
+
+**Commits**: each task is committed as `<type>: <title>` in Conventional Commits form, with the type (`feat`, `fix`,
+`chore`, `docs`, `test`, `refactor`, `style`, `perf`) chosen by the planner. A plan without a type falls back to
+`T1: <title>`. The lines under the subject come from `"commit": {"trailer": "..."}`, default
+`Gates passed: {gates}`. The placeholders are `{model}` (the implementer's model id), `{version}` (the harness
+version), `{checks}` (how many gates passed) and `{gates}` (their names), for example
+`"Commit by {model} from vb-harness {version}. {checks} checks passed"`.
 
 **Review** (`review`, default `full`): `full` reviews every task and the whole run; `light` skips the per-task
 review of a small change (80 changed lines or fewer) whose gates passed first time, and keeps the final review;
@@ -127,7 +135,7 @@ component"` (or the note box on its card in the app) sends it a note, which the 
 as your words. An agent can also ask you a question with `ask_user` when the task is ambiguous: the question shows
 on the card, in the events and in `run.json`, and your next note is the answer. If none comes within
 `agent.askTimeoutSec`, the agent decides for itself and says in its summary what it assumed. In the app, Settings
-switches the way of working between Pipeline and Agent, and an agent-mode card's details list each agent's steps.
+switches the way of working between Pipeline and Agent, and an agent-mode card's **Agent activity** lists each agent's steps.
 
 Agent mode makes many more model calls than the pipeline; with a local model, expect a task to take several
 times longer. Models without native tool calls use a JSON reply protocol, one tool per reply.
