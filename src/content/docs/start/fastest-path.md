@@ -16,19 +16,23 @@ cd vb-harness-for-agentic-building
 ruby exe/harness
 ```
 
-The app opens in your browser. To see a whole build before setting anything up, choose **Try the demo** in
-Settings (or run `ruby exe/harness demo`): a scripted model builds a tiny sample project, with a failed check, its
-fix and a review, in under a minute. Then, in **Settings · providers**, choose **Use** on a model. Switch to **Build**, pick
-your project, describe the feature, and send. Two things stop a run before it starts, each with a message saying
-what to do: a project without its dependencies installed (run `npm install` in it first) and uncommitted changes
-(commit or stash them).
+The app opens in your browser on a start page with three steps: connect a model, add a project, describe what to
+build. To see a whole build before setting anything up, choose **Try the demo** there (or run
+`ruby exe/harness demo`): a scripted model builds a tiny sample project, with a failed check, its fix and a review,
+in under a minute. Then **Connect** opens **Settings → Models**, where you choose **Use** on a model. Switch the text
+box to **Build**, pick your project, describe the feature, and choose **Start build**. Two things stop a run before
+it starts, each with a message under the text box saying what to do: a project without its dependencies installed
+(run `npm install` in it first) and uncommitted changes (commit or stash them).
 
 On the command line instead, `ruby exe/harness init` asks a few questions (Enter accepts each default), and
 `ruby exe/harness run --repo ../my-site --request request.md` builds what `request.md` describes.
 
-Stuck? `ruby exe/harness doctor --repo ../my-site` (or **Check setup** at the top of Settings) lists every reason a
+Stuck? `ruby exe/harness doctor --repo ../my-site` (or **Settings → Check setup**) lists every reason a
 build would not start, each with what to do, without changing anything or asking a model to write.
 
-[![An animated walkthrough of a run: a request, the live progress card, rejected outputs and why, the evidence-gated review, a claim confirmed by a failing test, and the finished Badge component rendered on the pricing page](/media/demo-preview.webp)](/media/demo.mp4)
+[![An animated walkthrough of an agent-mode run in the app: Check setup lists every check as passing, a four-part blog request is sent with Start build, an agent investigates the repository and the plan is checked, the build card moves through Plan, Tasks, Final checks, Review and Report while four tasks are worked by agents and a note is sent to steer them, the model answers the checks caught are listed with plain reasons, the evidence-gated review stops three unproven claims, and the finished blog pages are shown next to the code that built them](/media/demo-preview.webp)](/media/demo.mp4)
 
-*An animated illustration of a run in the app, ending with the component it built, rendered (not a screen recording). Click it for the 1080p, 60 fps video.*
+*An animated illustration of a run in the app (not a screen recording). The plan, code, numbers, review claims and
+pages come from a real agent-mode run of evaluation task 10 with a local model on a 6 GB laptop GPU, which took
+3 hours 28 minutes. The steering note shows the feature and was not part of that run, and the pages are shown in a
+layout with cover art made for the video; the run's own files are unchanged. Click it for the 1080p, 60 fps video.*
