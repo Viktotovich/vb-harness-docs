@@ -1,6 +1,6 @@
 ---
 title: "Quick start: the app"
-description: "bash ruby exe/harness"
+description: "This starts the local app on http://127.0.0.1:4567/ and, on first start, opens your browser on the start page."
 sidebar:
   order: 4
 ---
@@ -29,8 +29,9 @@ working sit at the bottom of the sidebar, next to **Settings**.
 
    ![Settings → Models: the model in use with its probed abilities as labels, the planning-and-review picker, and LM Studio and Ollama as found on this machine](../../../assets/media/app-connect-a-model.png)
 2. **Chat.** Chat mode is a planning conversation: work out what to build, compare approaches, sketch the steps.
-   Ctrl+Enter (⌘+Enter on macOS) sends; Enter adds a line. Replies stream, and thinking text sits in a collapsed
-   **Thinking** block. Chat changes no files. **Use as build request** under a reply copies it into the text box in
+   Ctrl+Enter (⌘+Enter on macOS) sends; Enter adds a line. Replies stream. When the model thinks first, you see
+   **Thinking… 4s** with its latest line of thought as it works; afterwards it folds into **Thought for 12s** above
+   the reply, and a click opens the whole thought process so you can judge how it got there. Chat changes no files. **Use as build request** under a reply copies it into the text box in
    Build mode, for you to edit and send: nothing starts until you do.
 
    ![A planning chat: asked about a Badge component for an Astro site, the local model replies with an approach and a sketch of the component; under the reply, Use as build request](../../../assets/media/app-chat.png)

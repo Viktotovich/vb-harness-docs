@@ -1,6 +1,6 @@
 ---
 title: "Quick start: the command line"
-description: "bash ruby exe/harness demo # a whole run on a sample project, no model needed ruby exe/harness init # write config.json, asking a few questions ruby exe/harness doctor --repo /path/to/repo # check everything a run needs, in one list ruby exe/harness run --repo /path/to/repo --request request.md ruby exe/harness status # the newest run: tasks, current step, rejections ruby exe/harness status RUNID --watch # refresh every second until it stops ruby exe/harness answer RUNID # answer the planner's blocking questions ruby exe/harness steer RUNID 'a note' # steer a running agent-mode run, or answer its question ruby exe/harness resume RUNID # continue after a stop, a crash or new answers ruby exe/harness report RUNID # (re)write runs/RUNID/report.md and print its path"
+description: "request.md is plain text, as you would write it to a colleague:"
 sidebar:
   order: 5
 ---

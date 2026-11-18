@@ -26,6 +26,7 @@ const PAGES = [
   { slug: "start/the-app", title: "Quick start: the app", sections: ["Quick start: the app"] },
   { slug: "start/the-command-line", title: "Quick start: the command line", sections: ["Quick start: the command line"] },
   { slug: "guides/projects", title: "Projects and workspaces", sections: ["Projects and workspaces"] },
+  { slug: "guides/phone", title: "Use it from your phone (LAN mode)", sections: ["Use it from your phone (LAN mode)"] },
   { slug: "guides/understanding-a-run", title: "Understanding a run", sections: ["Understanding a run"] },
   { slug: "guides/figma", title: "Building from a Figma design", sections: ["Building from a Figma design"] },
   { slug: "guides/configuration", title: "Configuration", sections: ["Configuration"] },
@@ -94,7 +95,7 @@ function rewrite(md, sourceDir, pageSlug) {
 
 // The first sentence of the first plain paragraph, without Markdown, for the page description.
 function describe(md) {
-  const para = md.split(/\n\s*\n/).find((p) => /^[A-Za-z*`[]/.test(p.trim()) && !p.trim().startsWith("!["));
+  const para = md.split(/\n\s*\n/).find((p) => /^[A-Za-z*`[]/.test(p.trim()) && !p.trim().startsWith("![") && !/^(```|~~~)/.test(p.trim()));
   const plain = (para || "").replace(/!\[[^\]]*\]\([^)]*\)/g, "").replace(/\[([^\]]*)\]\([^)]*\)/g, "$1").replace(/[*`_]/g, "").replace(/\s+/g, " ").trim();
   return (plain.match(/^.*?[.!?](\s|$)/)?.[0] || plain).trim().replace(/"/g, "'");
 }

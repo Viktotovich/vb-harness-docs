@@ -1,6 +1,6 @@
 ---
 title: "Install"
-description: "bash git clone https://github.com/Viktotovich/vb-harness-for-agentic-building.git cd vb-harness-for-agentic-building ruby exe/harness --version"
+description: "That is all: there is nothing to install with gem or bundle."
 sidebar:
   order: 3
 ---
