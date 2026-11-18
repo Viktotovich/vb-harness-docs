@@ -12,7 +12,7 @@ export default defineConfig({
     starlight({
       title: "VB Harness",
       description: "VB Harness: proof-first coding with local models. Small tasks, your project's own checks, and an evidence-gated review.",
-      favicon: "/favicon.svg",
+      favicon: "/favicon.png",
       social: [{ icon: "github", label: "GitHub", href: REPO }],
       customCss: ["./src/styles/fonts.css", "./src/styles/theme.css"],
       components: {
