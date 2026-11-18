@@ -11,7 +11,7 @@ export default defineConfig({
   integrations: [
     starlight({
       title: "VB Harness",
-      description: "VB Harness: real coding work from a local model. Small tasks, your project's own checks, and an evidence-gated review.",
+      description: "VB Harness: verified agentic development for local models. Small tasks, your project's own checks, and an evidence-gated review.",
       favicon: "/favicon.svg",
       social: [{ icon: "github", label: "GitHub", href: REPO }],
       customCss: ["./src/styles/fonts.css", "./src/styles/theme.css"],
