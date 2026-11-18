@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://vb-harness.vandbruno.net/sitemap-index.xml
