@@ -10,7 +10,7 @@ export default defineConfig({
   site: "https://vb-harness.vandbruno.net",
   integrations: [
     starlight({
-      title: "vb-harness",
+      title: "VB Harness",
       description: "Real coding work from a local model: small tasks, your project's own checks, and an evidence-gated review.",
       favicon: "/favicon.svg",
       social: [{ icon: "github", label: "GitHub", href: REPO }],
@@ -25,7 +25,15 @@ export default defineConfig({
         themes: ["github-dark-default"],
         styleOverrides: { borderRadius: "4px", borderColor: "#2b2b33", codeBackground: "#16161a", frames: { editorTabBarBackground: "#0f0f12", terminalTitlebarBackground: "#0f0f12" } }
       },
-      head: [{ tag: "meta", attrs: { name: "theme-color", content: "#0b0b0d" } }],
+      head: [
+        { tag: "meta", attrs: { name: "theme-color", content: "#16151c" } },
+        // The link preview for every page: the app at work, with the name and what it does.
+        { tag: "meta", attrs: { property: "og:image", content: "https://vb-harness.vandbruno.net/og.png" } },
+        { tag: "meta", attrs: { property: "og:image:width", content: "1200" } },
+        { tag: "meta", attrs: { property: "og:image:height", content: "630" } },
+        { tag: "meta", attrs: { property: "og:image:alt", content: "VB Harness: real coding work from a local model. The app building a blog task by task." } },
+        { tag: "meta", attrs: { name: "twitter:image", content: "https://vb-harness.vandbruno.net/og.png" } }
+      ],
       sidebar: [
         { label: "Getting started", items: [{ autogenerate: { directory: "start" } }] },
         { label: "Guides", items: [{ autogenerate: { directory: "guides" } }] },
