@@ -36,3 +36,11 @@ The harness assumes the model can be wrong or manipulated, and limits what it ca
 
 Each of these has a test in [`test/guardrails_test.rb`](https://github.com/Viktotovich/vb-harness-for-agentic-building/blob/main/test/guardrails_test.rb). See [SECURITY.md](https://github.com/Viktotovich/vb-harness-for-agentic-building/blob/main/SECURITY.md)
 to report a vulnerability.
+
+**Not vulnerable to ruby2shell.** [ruby2shell](https://verialabs.com/ruby2shell/) (GHSA-34m4-m9fh-gqp5) is a heap
+overflow in Ruby itself, reached by `upcase`, `swapcase`, `downcase(:fold)` or `casecmp?` on text in a legacy
+single-byte encoding (ISO-8859, Windows-125x). The harness changes the case of text only through
+[`Harness::Ascii`](https://github.com/Viktotovich/vb-harness-for-agentic-building/blob/main/lib/harness/ascii.rb), which works on raw bytes and never enters that code path, and
+[`test/ascii_test.rb`](https://github.com/Viktotovich/vb-harness-for-agentic-building/blob/main/test/ascii_test.rb) fails the build if any other such call appears in `lib/`. The app's
+server reads requests as raw bytes and matches header names with a plain `downcase`, which the bug does not touch.
+`harness doctor` still tells you when your Ruby itself has the bug, so you can upgrade it for other software.
