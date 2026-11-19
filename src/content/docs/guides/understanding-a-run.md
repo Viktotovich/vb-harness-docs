@@ -27,7 +27,7 @@ changed while the run was paused. Each line says what to do about it.
 Replies that were discarded and retried with thinking off count too. Rejections show where a model struggles, and
 they are how you compare models.
 
-![A report in the app, open beside the chat: the demo run's summary, the tasks table with both tasks done and their commits, gates compared with the baseline, and empty Findings and Questions](../../../assets/media/app-report.png)
+![A report in the app, open beside the chat and scrolled past its plain-words summary: Read this first, the tasks table with both tasks done and their commits, gates compared with the baseline, and empty Findings and Questions](../../../assets/media/app-report.png)
 
 **Findings** in the report are only claims confirmed by a failing test. Everything else the review raised is under
 **Questions**, clearly marked as unconfirmed.
