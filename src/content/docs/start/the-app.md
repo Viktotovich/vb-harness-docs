@@ -36,8 +36,8 @@ working sit at the bottom of the sidebar, next to **Settings**.
 
    ![A planning chat: asked about a Badge component for an Astro site, the local model thought for 15 seconds (folded under "Thought for 15s") and replies with an approach and a sketch of the component; under the reply, Use as build request](../../../assets/media/app-chat.png)
 3. **Build.** Switch the text box to **Build**, pick a project (or **Add project**), describe the feature, and choose
-   **Start build**. The line under the text box says what will happen, or what stops the build (uncommitted changes,
-   a project with a problem). A live card in the chat shows the run:
+   **Start build**. The line under the text box says what will happen; if something stops the build (uncommitted
+   changes, a project with a problem), a card in the chat above the text box says what and offers its fixes. A live card in the chat shows the run:
    - a progress bar, **Plan → Tasks → Final checks → Review → Report**;
    - a **Now** line in plain words ("T1 Double the price: running your checks") with how long ago it last moved, so a
      model that is still writing a long answer is not mistaken for a hang;

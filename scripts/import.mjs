@@ -27,6 +27,7 @@ const PAGES = [
   { slug: "start/the-app", title: "Quick start: the app", sections: ["Quick start: the app"] },
   { slug: "start/the-command-line", title: "Quick start: the command line", sections: ["Quick start: the command line"] },
   { slug: "guides/projects", title: "Projects and workspaces", sections: ["Projects and workspaces"] },
+  { slug: "guides/help-and-shortcuts", title: "Help, settings and shortcuts", sections: ["Help, settings and shortcuts"] },
   { slug: "guides/phone", title: "Use it from your phone (LAN mode)", sections: ["Use it from your phone (LAN mode)"] },
   { slug: "guides/understanding-a-run", title: "Understanding a run", sections: ["Understanding a run"] },
   { slug: "guides/figma", title: "Building from a Figma design", sections: ["Building from a Figma design"] },
@@ -38,7 +39,8 @@ const PAGES = [
   { slug: "concepts/evaluation", title: "Evaluation", sections: ["Evaluation"] },
   { slug: "concepts/limitations", title: "Limitations", sections: ["Limitations"] },
   { slug: "concepts/why-ruby", title: "Why Ruby", sections: ["Why Ruby"] },
-  { slug: "project/development", title: "Development and license", sections: ["Development", "License"] }
+  { slug: "project/development", title: "Development and license", sections: ["Development", "License"] },
+  { slug: "project/disclaimer", title: "Disclaimer", sections: ["Disclaimer"] }
 ];
 const FILES = [
   { slug: "cookbook/astro-landing-page", title: "An Astro landing page with a local model", file: "docs/cookbook/astro-landing-page.md", strip: ["**Contents**"] },
