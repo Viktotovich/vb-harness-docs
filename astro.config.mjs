@@ -39,7 +39,7 @@ export default defineConfig({
         { label: "Guides", items: [{ autogenerate: { directory: "guides" } }] },
         { label: "Cookbook", items: [{ autogenerate: { directory: "cookbook" } }] },
         { label: "Concepts", items: [{ autogenerate: { directory: "concepts" } }] },
-        { label: "Project", items: [{ slug: "project/development" }, { label: "Need help?", slug: "need-help" }] }
+        { label: "Project", items: [{ slug: "project/development" }, { slug: "project/disclaimer" }, { label: "Need help?", slug: "need-help" }] }
       ]
     })
   ]

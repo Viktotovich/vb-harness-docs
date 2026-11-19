@@ -21,8 +21,9 @@ build. To see a whole build before setting anything up, choose **Try the demo** 
 `ruby exe/harness demo`): a scripted model builds a tiny sample project, with a failed check, its fix and a review,
 in under a minute. Then **Connect** opens **Settings → Models**, where you choose **Use** on a model. Switch the text
 box to **Build**, pick your project, describe the feature, and choose **Start build**. If the project is not set up
-yet (dependencies not installed, a generated folder missing, a package its checks need), the line under the text box
-says so and offers a **Fix** button: it shows the exact command, runs it after you confirm, and you build. The one
+yet (dependencies not installed, a generated folder missing, a package its checks need), a card in the chat, just
+above the text box, says so and offers a **Fix** button: it shows the exact command in the card, runs it after you
+confirm, shows its output there, and you build. The one
 thing it leaves to you is uncommitted changes: commit or stash them. **Preview** next to the project runs its dev
 server (for Astro, `astro dev`) on `127.0.0.1` and opens it; a finished build has a Preview of what it made.
 
