@@ -140,5 +140,5 @@ FILES.forEach((f, i) => {
 rmSync(assets, { recursive: true, force: true });
 rmSync(pub, { recursive: true, force: true });
 copyTree(join(harness, "docs", "media"), assets, (n) => !AS_IS.test(n));
-copyTree(join(harness, "docs", "media"), pub, (n) => AS_IS.test(n) || n === "demo-poster.png");
+copyTree(join(harness, "docs", "media"), pub, (n) => AS_IS.test(n));
 console.log("copied media");
