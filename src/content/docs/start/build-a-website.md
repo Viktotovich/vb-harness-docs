@@ -12,7 +12,7 @@ one click shows it in your browser. Setup takes about 30 minutes, once.
 
 [![A screen recording of a first run on Windows, sped up and labelled: VB Harness is downloaded from GitHub as a ZIP, Smart App Control blocks the double-clicked start file, a terminal in the folder starts the app with ruby exe\harness and the browser opens on it, a local model is connected by its address, a new Astro site is added, a request for a bakery welcome page is typed, the type check and site build pass, and the card reads Built 1 of 1 part, saved on its own branch, followed by the plain page it built](/media/first-run-preview.webp)](/media/first-run.mp4)
 
-*A real first run on Windows, from download to a change ready to merge, sped up to 68 s.*
+*A first run on Windows, from download to a change ready to merge, sped up to 68 s.*
 
 1. **Install LM Studio** from [lmstudio.ai](https://lmstudio.ai/). It runs AI models on your computer.
    Pick a video for the next two steps: a [quick LM Studio setup](https://www.youtube.com/watch?v=396Xg5ZSL80), or
