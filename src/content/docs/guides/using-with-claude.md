@@ -13,7 +13,8 @@ and a diff, while a model on your own machine does the planning, editing, fixing
 
 ![Claude writes the request (about 740 tokens), the harness and a local model do the work (93,400 tokens), and Claude reads the status, report and diff (about 6,400 tokens)](../../../assets/media/using-with-claude.svg)
 
-**What it saves, measured on the cookbook's third run** (eight tasks, a full landing page):
+**What it saves, measured on a run from an earlier version of the cookbook** (a 16K coder model, eight tasks, a
+full landing page):
 
 | | Tokens |
 | --- | --- |
