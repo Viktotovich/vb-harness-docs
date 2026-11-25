@@ -1031,3 +1031,19 @@ A user wanted to show the chat a design it could not open.
 - **The limits stay.** The page draws each picture at 1280 px or less and saves it as JPEG, so a message fits the 1 MB
   request limit, and a photo's metadata never leaves the browser. The server accepts only PNG, JPEG and WebP data URLs
   whose first bytes match, never a link: a link would make the model server fetch an address.
+
+## Chat looks things up: built in and read-only (0.1.76)
+
+A user asked Chat about a Figma link and about their project; it could open neither. The owner chose built-in reading
+over MCP servers (2026-11-25): an MCP server is a program a model drives, which I3, I4 and I15 do not allow.
+
+- **The agent's reading tools, over less.** A run's agent reads a copy that holds only committed files. Chat reads the
+  user's own folder, where untracked files may be private. So Chat gets a list of the files git tracks and sees nothing
+  else, not even in a listing; a tracked link counts as the file it leads to. Names that look like secrets are left out
+  even when tracked. `git ls-files -z --cached` joined the git allowlist for this; it reads the index only.
+- **Off until picked, every time.** What is read goes to the model server, which may not be this computer.
+- **The model never chooses what is fetched.** Figma links are read from the user's own message before the model
+  answers, as in Build, so a file cannot steer the token to another design. It also works without tool calls.
+- **Bounded.** Twelve lookups a reply, and about a third of the context for results. Results are fenced (I9) and not
+  kept in the chat; the list of what was looked at is.
+- **Not from a paired device (I15).** A phone may talk, not read the computer's files.

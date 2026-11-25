@@ -34,6 +34,12 @@ working sit at the bottom of the sidebar, next to **Settings**.
    the reply, and a click opens the whole thought process so you can judge how it got there. Chat changes no files. **Use as build request** under a reply copies it into the text box in
    Build mode, for you to edit and send: nothing starts until you do.
 
+   With a model that calls tools, pick **Reads …** under the text box to let Chat look through one project: it can list,
+   read and search the files git tracks, and nothing else. Untracked files and files that look like secrets stay out of
+   its reach, it changes nothing, and what it looked at is listed above the reply. What it reads goes to your model
+   server, so it starts at **Reads no project**. A Figma link you type is opened for you with your `FIGMA_TOKEN`. With a
+   model that sees images, **Picture** (or paste) adds a screenshot to your message. The harness measures both abilities.
+
    ![A planning chat: asked about a Badge component for an Astro site, the local model thought for 7 seconds (folded under "Thought for 7s") and replies with an approach and a sketch of the component; under the reply, Use as build request](../../../assets/media/app-chat.png)
 3. **Build.** Switch the text box to **Build**, pick a project (or **Add project**), describe the feature, and choose
    **Start build**. The line under the text box says what will happen; if something stops the build (uncommitted
