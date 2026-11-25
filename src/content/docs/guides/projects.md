@@ -16,6 +16,12 @@ the start page) offers three ways:
 - **Clone from a git URL.** A shallow clone of an `https://` URL into `projects/<name>`.
 - **New Astro project.** `npm create astro@latest` into `projects/<name>`, then a first commit.
 
+**Not an Astro project?** The app finds the checks the project already has and offers **Set up checks**: `package.json`
+scripts, a Ruby `bin/check`, Rake or RSpec, Python tests, `go vet` and `go test`, `cargo check` and `cargo test`, or a
+Makefile's `check` or `test`. You see the exact commands first; **Add these checks** saves them in your `config.json` for
+that project only, and nothing runs until you build. They decide which changes are kept, so a project with no checks
+needs at least one first.
+
 Clone and New Astro project download code, so the dialog first shows you the exact command and runs it only after
 you choose **Clone project** or **Create project**. The app never lists folders on your disk.
 
