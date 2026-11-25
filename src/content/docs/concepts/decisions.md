@@ -986,3 +986,48 @@ an empty diff, and the task was committed as done with no changes. Two gaps, two
 - **The request check no longer skips quietly on an empty diff.** "The diff is in 0 parts" was logged as a plain
   skip. Now an empty change, or one whose every file was filtered out of review, records the check as not run, with
   `request.nothing_to_check` and a line in the review's failures.
+
+## An agent may not write the files of a task still to come (0.1.73)
+
+In a cookbook run, one agent wrote the files of three later tasks. Those tasks had nothing left to change, were blocked
+with `task.no_changes`, and a run whose work was all there ended failed. It happened again in the next run.
+
+- **The overreach is refused, not cleaned up.** The run gives each agent task the files that tasks still to come are
+  planned to write or delete. Writing, editing or deleting one returns an error naming its task. A file both tasks
+  plan stays writable, and so does a file no task plans (a helper).
+- **"Already done" was considered and left out.** Marking a task done because its files changed earlier in the run
+  would pass a task that did nothing whenever an earlier task shares a file with it, which is common. That is the
+  failure `task.no_changes` exists to catch (see "An empty diff is not done").
+- **The card says what is unfinished.** A run that raised no error said "The run stopped on an error."
+
+## Projects that are not Astro: their own checks, added once the user has seen them (0.1.74)
+
+The config ships one stack, so a user who pointed the harness at its own Ruby source got "no configured stack matches
+(stacks: astro)" and nothing to click.
+
+- **Suggest, do not assume.** `Gates::Suggest` reads a few well-known files and proposes fixed argv. It runs, installs
+  and writes nothing. The gates become real only as a stack in `config.json`, written after the user saw the exact
+  commands, so I3 ("commands from config") still describes everything a run executes. LAN devices cannot do it (I15).
+- **Per project.** Two Node projects have different scripts, and a stack's detect files cannot tell them apart. A
+  stack may name one folder (`project`); it is then used for that project only. A run works in a copy, so the stack is
+  looked up by the project's own folder.
+- **No checks, no build.** With nothing to run, every task would pass, and I7 would mean nothing. The project says
+  what is missing instead.
+- **Nothing that fetches.** npx and cargo run offline, go does not change go.mod, and scripts that watch are skipped
+  (a gate must end).
+- **Touched tests alone are not enough.** A gate that runs only the test files a task changed passes when it changed
+  none, so a project needs at least one check of the whole project.
+- **`detect` takes patterns.** `*.gemspec` in a config never matched, because names were compared exactly.
+
+## Pictures in Chat, for models that see them (0.1.75)
+
+A user wanted to show the chat a design it could not open.
+
+- **Measured, not assumed (I1).** The probe shows two small pictures of one colour each and accepts only an answer that
+  names both. A server that ignores pictures, or a model that guesses, fails. The page offers **Picture** only then, and
+  the server refuses pictures for any other model.
+- **Chat only.** Every step of a build is text with exact edits, and a picture cannot be checked. The model turns a
+  picture into words in Chat, and those words go to Build, where the user can read them first.
+- **The limits stay.** The page draws each picture at 1280 px or less and saves it as JPEG, so a message fits the 1 MB
+  request limit, and a photo's metadata never leaves the browser. The server accepts only PNG, JPEG and WebP data URLs
+  whose first bytes match, never a link: a link would make the model server fetch an address.
