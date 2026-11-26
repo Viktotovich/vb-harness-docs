@@ -1047,3 +1047,24 @@ over MCP servers (2026-11-25): an MCP server is a program a model drives, which 
 - **Bounded.** Twelve lookups a reply, and about a third of the context for results. Results are fenced (I9) and not
   kept in the chat; the list of what was looked at is.
 - **Not from a paired device (I15).** A phone may talk, not read the computer's files.
+
+## An agent that goes in a circle, and a conversation that outgrows the context (0.1.77)
+
+A self-patch run blocked on `model.context_overflow` after 43 steps. Its events told another story: the agent broke a
+file's syntax, then made the same read, the same failing edit and the same whole-file rewrite ("no change", seven times)
+for an hour.
+
+- **Repeating is noticed.** The same call with the same result, with no file changed in between, is pointed out the third
+  time and ends the try the sixth. It then goes to the recovery ladder as `agent.stuck`, and the next try is told that the
+  approach does not work. A change to a file starts the count anew, so running one check after every edit is fine.
+- **What the model wrote counts.** The trim added up message text only; the arguments of tool calls, where whole files
+  are, were invisible to it. A conversation near the limit now drops its oldest steps whole, as the client counts them,
+  and leaves one fenced line for each. Cutting the arguments instead was rejected: a model copies what it sees, and
+  would write the placeholder into a file.
+- **What people said is kept.** The task always stays, and so do short notes from the user or the harness.
+- **Overflow is a stall, not the end.** It goes to the ladder too: a new conversation starts small.
+- **A file under both create and modify.** The disk decides which, and the event log says so. A file listed only under
+  create that exists is still refused: that may be a planner that does not know the repository.
+- **A task that only inspects is folded in.** Two field runs lost every replan to a first task that changed no files.
+  When another task writes, the inspection's reading and intent move into the task that depends on it (or the next one
+  that writes), and dependencies on it pass through. A plan where nothing writes is still refused.
